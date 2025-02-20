@@ -1,0 +1,275 @@
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   333 Music App
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet"/>
+ </head>
+ <body class="bg-gray-900 text-white font-roboto">
+  <header class="bg-yellow-500 p-4 flex items-center justify-between">
+   <div class="flex items-center">
+    <img alt="One Piece logo with a pirate skull and crossbones" class="h-10 w-10" height="50" src="https://storage.googleapis.com/a1aa/image/5CRUNDv9grFbeEHqtoNQPY-33RvBGdNX0r7dxIYNiZc.jpg" width="50"/>
+    <h1 class="text-2xl font-bold ml-2">
+     333 Music
+    </h1>
+   </div>
+   <nav class="flex space-x-4">
+    <a class="hover:text-gray-300" href="#">
+     Home
+    </a>
+    <a class="hover:text-gray-300" href="#">
+     Search
+    </a>
+    <a class="hover:text-gray-300" href="#">
+     Library
+    </a>
+   </nav>
+  </header>
+  <main class="p-4">
+   <section class="mb-8">
+    <h2 class="text-3xl font-bold mb-4">
+     Search Music
+    </h2>
+    <div class="flex items-center bg-gray-800 p-4 rounded-lg">
+     <input class="bg-gray-700 text-white p-2 rounded-lg flex-grow" id="searchInput" placeholder="Search for songs, artists, or albums" type="text"/>
+     <button class="bg-yellow-500 text-gray-900 p-2 rounded-lg ml-2" onclick="searchMusic()">
+      <i class="fas fa-search">
+      </i>
+     </button>
+    </div>
+    <div class="mt-4" id="searchResults">
+    </div>
+   </section>
+   <section class="mb-8">
+    <h2 class="text-3xl font-bold mb-4">
+     Upload Music
+    </h2>
+    <div class="bg-gray-800 p-4 rounded-lg">
+     <input accept="image/*" class="bg-gray-700 text-white p-2 rounded-lg w-full mb-2" id="coverInput" type="file"/>
+     <input accept="audio/*" class="bg-gray-700 text-white p-2 rounded-lg w-full mb-2" id="fileInput" type="file"/>
+     <button class="bg-yellow-500 text-gray-900 p-2 rounded-lg w-full" onclick="uploadMusic()">
+      Upload
+     </button>
+    </div>
+    <div class="mt-4" id="uploadedMusic">
+    </div>
+   </section>
+   <section class="mb-8">
+    <h2 class="text-3xl font-bold mb-4">
+     Create Playlist
+    </h2>
+    <div class="bg-gray-800 p-4 rounded-lg">
+     <input class="bg-gray-700 text-white p-2 rounded-lg w-full mb-2" id="playlistNameInput" placeholder="Playlist Name" type="text"/>
+     <button class="bg-yellow-500 text-gray-900 p-2 rounded-lg w-full" onclick="createPlaylist()">
+      Create Playlist
+     </button>
+    </div>
+    <div class="mt-4" id="playlists">
+    </div>
+   </section>
+   <section class="mb-8">
+    <h2 class="text-3xl font-bold mb-4">
+     Music Player
+    </h2>
+    <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+     <div class="flex items-center">
+      <img alt="Album cover placeholder" class="h-16 w-16 rounded-lg mr-4" height="100" id="playerCover" src="https://storage.googleapis.com/a1aa/image/y8R9pJe06n3Gbd5AisjPAsxgFcDYeHr5Q7YsJZzGBes.jpg" width="100"/>
+      <div>
+       <h3 class="text-lg font-semibold" id="playerTitle">
+        No song playing
+       </h3>
+       <p class="text-gray-400" id="playerArtist">
+        -
+       </p>
+      </div>
+     </div>
+     <div class="flex items-center space-x-4">
+      <button class="text-gray-400 hover:text-white" onclick="prevSong()">
+       <i class="fas fa-backward">
+       </i>
+      </button>
+      <button class="text-gray-400 hover:text-white" onclick="togglePlayPause()">
+       <i class="fas fa-play" id="playPauseIcon">
+       </i>
+      </button>
+      <button class="text-gray-400 hover:text-white" onclick="nextSong()">
+       <i class="fas fa-forward">
+       </i>
+      </button>
+     </div>
+    </div>
+    <audio id="audioPlayer" onended="nextSong()">
+     <source id="audioSource" src="" type="audio/mpeg"/>
+    </audio>
+   </section>
+  </main>
+  <footer class="bg-gray-800 p-4 mt-8">
+   <div class="flex justify-between items-center">
+    <div class="flex items-center">
+     <img alt="One Piece logo with a pirate skull and crossbones" class="h-10 w-10" height="50" src="https://storage.googleapis.com/a1aa/image/5CRUNDv9grFbeEHqtoNQPY-33RvBGdNX0r7dxIYNiZc.jpg" width="50"/>
+     <h1 class="text-2xl font-bold ml-2">
+      333 Music
+     </h1>
+    </div>
+    <nav class="flex space-x-4">
+     <a class="hover:text-gray-300" href="#">
+      About
+     </a>
+     <a class="hover:text-gray-300" href="#">
+      Contact
+     </a>
+     <a class="hover:text-gray-300" href="#">
+      Privacy Policy
+     </a>
+    </nav>
+   </div>
+  </footer>
+  <script>
+   let uploadedSongs = [];
+   let currentSongIndex = -1;
+   let playlists = [];
+
+   function searchMusic() {
+     const query = document.getElementById('searchInput').value;
+     const resultsContainer = document.getElementById('searchResults');
+     resultsContainer.innerHTML = '';
+
+     // Simulate search results
+     const results = [
+       { title: "Luffy's Anthem", artist: "Monkey D. Luffy" },
+       { title: "Swordsman's Spirit", artist: "Roronoa Zoro" },
+       { title: "Navigator's Melody", artist: "Nami" },
+     ];
+
+     results.forEach(result => {
+       const resultItem = document.createElement('div');
+       resultItem.className = 'bg-gray-800 p-4 rounded-lg flex items-center mb-2';
+       resultItem.innerHTML = `
+         <div>
+           <h3 class="text-lg font-semibold">${result.title}</h3>
+           <p class="text-gray-400">Artist: ${result.artist}</p>
+         </div>
+       `;
+       resultsContainer.appendChild(resultItem);
+     });
+   }
+
+   function uploadMusic() {
+     const fileInput = document.getElementById('fileInput');
+     const coverInput = document.getElementById('coverInput');
+     const uploadedMusicContainer = document.getElementById('uploadedMusic');
+     const file = fileInput.files[0];
+     const cover = coverInput.files[0];
+
+     if (file && cover) {
+       const coverURL = URL.createObjectURL(cover);
+       const musicItem = document.createElement('div');
+       musicItem.className = 'bg-gray-800 p-4 rounded-lg flex items-center mb-2';
+       musicItem.innerHTML = `
+         <img src="${coverURL}" alt="Cover image for ${file.name}" class="h-16 w-16 rounded-lg mr-4">
+         <div>
+           <h3 class="text-lg font-semibold">${file.name}</h3>
+           <audio controls class="w-full mt-2">
+             <source src="${URL.createObjectURL(file)}" type="${file.type}">
+             Your browser does not support the audio element.
+           </audio>
+         </div>
+       `;
+       uploadedMusicContainer.appendChild(musicItem);
+
+       uploadedSongs.push({
+         title: file.name,
+         artist: 'Unknown Artist',
+         src: URL.createObjectURL(file),
+         cover: coverURL
+       });
+
+       if (currentSongIndex === -1) {
+         currentSongIndex = 0;
+         loadSong(currentSongIndex);
+       }
+     }
+   }
+
+   function createPlaylist() {
+     const playlistNameInput = document.getElementById('playlistNameInput');
+     const playlistName = playlistNameInput.value.trim();
+     if (playlistName) {
+       playlists.push({ name: playlistName, songs: [] });
+       renderPlaylists();
+       playlistNameInput.value = '';
+     }
+   }
+
+   function renderPlaylists() {
+     const playlistsContainer = document.getElementById('playlists');
+     playlistsContainer.innerHTML = '';
+     playlists.forEach((playlist, index) => {
+       const playlistItem = document.createElement('div');
+       playlistItem.className = 'bg-gray-800 p-4 rounded-lg mb-2';
+       playlistItem.innerHTML = `
+         <h3 class="text-lg font-semibold">${playlist.name}</h3>
+         <button class="bg-yellow-500 text-gray-900 p-2 rounded-lg mt-2" onclick="addToPlaylist(${index})">Add Current Song</button>
+         <div class="mt-2">
+           ${playlist.songs.map(song => `<p>${song.title} by ${song.artist}</p>`).join('')}
+         </div>
+       `;
+       playlistsContainer.appendChild(playlistItem);
+     });
+   }
+
+   function addToPlaylist(playlistIndex) {
+     if (currentSongIndex !== -1) {
+       const song = uploadedSongs[currentSongIndex];
+       playlists[playlistIndex].songs.push(song);
+       renderPlaylists();
+     }
+   }
+
+   function loadSong(index) {
+     const song = uploadedSongs[index];
+     document.getElementById('playerTitle').innerText = song.title;
+     document.getElementById('playerArtist').innerText = song.artist;
+     document.getElementById('playerCover').src = song.cover;
+     document.getElementById('audioSource').src = song.src;
+     document.getElementById('audioPlayer').load();
+   }
+
+   function togglePlayPause() {
+     const audioPlayer = document.getElementById('audioPlayer');
+     const playPauseIcon = document.getElementById('playPauseIcon');
+
+     if (audioPlayer.paused) {
+       audioPlayer.play();
+       playPauseIcon.classList.remove('fa-play');
+       playPauseIcon.classList.add('fa-pause');
+     } else {
+       audioPlayer.pause();
+       playPauseIcon.classList.remove('fa-pause');
+       playPauseIcon.classList.add('fa-play');
+     }
+   }
+
+   function prevSong() {
+     if (currentSongIndex > 0) {
+       currentSongIndex--;
+       loadSong(currentSongIndex);
+       document.getElementById('audioPlayer').play();
+     }
+   }
+
+   function nextSong() {
+     if (currentSongIndex < uploadedSongs.length - 1) {
+       currentSongIndex++;
+       loadSong(currentSongIndex);
+       document.getElementById('audioPlayer').play();
+     }
+   }
+  </script>
+ </body>
+</html>
